@@ -22,3 +22,5 @@ go.work
 
 # Goland config
 .idea
+
+.env
