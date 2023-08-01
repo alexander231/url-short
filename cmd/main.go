@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/joho/godotenv"
+	"github.com/pkg/errors"
 	"os"
 )
 
@@ -13,6 +15,9 @@ func main() {
 }
 
 func run() error {
-	fmt.Println("Hi short-url")
+	if err := godotenv.Load("../.env"); err != nil {
+		return errors.Wrap(err, "Loading of envs failed")
+	}
+
 	return nil
 }
