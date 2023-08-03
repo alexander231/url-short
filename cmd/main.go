@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/alexander231/url-short/storage"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -19,5 +21,14 @@ func run() error {
 		return errors.Wrap(err, "Loading of .env file failed")
 	}
 
+	addr := os.Getenv("ADDR")
+	pass := os.Getenv("PASS")
+	dbStr := os.Getenv("DB")
+
+	db, err := strconv.Atoi(dbStr)
+	if err != nil {
+		return errors.Wrap(err, "Converting DB env var failed")
+	}
+	rdb := storage.NewRedisStorage(addr, pass, db)
 	return nil
 }
