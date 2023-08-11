@@ -30,3 +30,7 @@ redis.conf
 
 # redis data dump for recovery
 dump.rdb
+
+# air config
+.air.toml
+tmp
