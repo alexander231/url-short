@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/alexander231/url-short/storage"
+	"github.com/alexander231/url-short/http"
+	"github.com/alexander231/url-short/redis"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
 	"os"
@@ -18,7 +19,7 @@ func main() {
 
 func run() error {
 	if err := godotenv.Load(".env"); err != nil {
-		return errors.Wrap(err, "Loading of .env file failed")
+		return errors.Wrap(err, "Loading of .env file")
 	}
 
 	addr := os.Getenv("ADDR")
@@ -27,8 +28,17 @@ func run() error {
 
 	db, err := strconv.Atoi(dbStr)
 	if err != nil {
-		return errors.Wrap(err, "Converting DB env var failed")
+		return errors.Wrap(err, "Converting DB env var")
 	}
-	rdb := storage.NewRedisStorage(addr, pass, db)
+
+	rdb := redis.NewStorage(addr, pass, db)
+	URLService := redis.NewURLService(rdb)
+
+	srv := http.NewServer(URLService)
+	srv.Addr = ":8080"
+
+	if err = srv.ListenAndServe(); err != nil {
+		return errors.Wrap(err, "Starting http server")
+	}
 	return nil
 }
