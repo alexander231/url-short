@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"github.com/pkg/errors"
 	"time"
 )
 
@@ -13,10 +14,16 @@ func NewURLService(db *Storage) *URLService {
 }
 
 func (s *URLService) Get(id string) (string, error) {
-	return "", nil
+	val, err := s.db.client.Get(s.db.ctx, id).Result()
+	if err != nil {
+		return "", errors.Wrap(err, "Getting URL from db")
+	}
+	return val, nil
 }
 
 func (s *URLService) Set(id string, url string, expiration time.Duration) error {
-	s.db.client.Set(s.db.ctx, id, url, expiration)
+	if err := s.db.client.Set(s.db.ctx, id, url, expiration).Err(); err != nil {
+		return errors.Wrap(err, "Saving URL to db")
+	}
 	return nil
 }
